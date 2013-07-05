@@ -391,7 +391,7 @@ extern int lineno;
 %token SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
 %token XOR_ASSIGN OR_ASSIGN CLCL MEM_PTR_OP
 
-%token FRIEND OPERATOR CONST CLASS STRUCT UNION ENUM 
+%token FRIEND OPERATOR CONST CLASS NAMESPACE STRUCT UNION ENUM 
 %token PROTECTED PRIVATE PUBLIC EXTERN ELIPSIS
 
 %type <string> simple_type_name simple_signed_type non_reference_type
@@ -407,11 +407,11 @@ extern int lineno;
 %type <string> primary_expression expression
 %type <string> multiplicative_expression additive_expression
 %type <flag> const_opt ampersand_opt
-%type <elt> class_specifier
+%type <elt> class_specifier namespace_specifier
 %type <elt> member_func_specifier function_specifier constructor
 %type <elt> destructor member_specifier member member_with_access
 %type <elt> mem_type_specifier member_or_error
-%type <elt> member_list member_list_opt
+%type <elt> member_list member_list_opt namespace_list_opt
 %type <elt> member_func_inlined type_specifier overloaded_op_specifier
 %type <elt> member_func_skel member_func_skel_spec
 %type <elt> constructor_skeleton destructor_skeleton
@@ -497,6 +497,7 @@ type_specifier
   $$ = elem;
 }
 	| class_specifier
+	| namespace_specifier
 	;
 
 ampersand_opt
@@ -1438,6 +1439,21 @@ union_specifier
 }
 	;
 
+namespace_specifier
+	: NAMESPACE IDENTIFIER '{' namespace_list_opt '}'
+{
+  syntaxelem_t *child;
+  /* ret_type, name, args, kind */
+  syntaxelem_t *tmp_elem = new_elem(strdup(""), $2, NULL, CLASS_KIND);
+  tmp_elem->children = reverse_list($4);
+  
+  for (child = tmp_elem->children; child != NULL; child = child->next)
+      child->parent = tmp_elem;
+
+/*   print_se(tmp_elem); */
+  $$ = tmp_elem;
+}
+
 class_specifier
 	: CLASS IDENTIFIER '{' member_list_opt '}'
 {
@@ -1575,6 +1591,12 @@ superclass
 friend_specifier
 	: FRIEND member_func_specifier		{ $2->kind = IGNORE_KIND; }
 	| FRIEND forward_decl
+	;
+
+namespace_list_opt
+	: /* nothing  */ { $$ = NULL; }
+	| member_list
+	| forward_decl
 	;
 
 member_list_opt

@@ -249,7 +249,7 @@ int tokens_seen;    /* set to 0        at beginning of each file */
 
 "typename"              { count(); tokens_seen++; /* FIXME */ }
 "using"                 { count(); tokens_seen++; /* FIXME */ }
-"namespace"             { count(); RETURN_VAL(CLASS); /* FIXME */ }
+"namespace"             { count(); RETURN_VAL(NAMESPACE); /* FIXME */ }
 
 "dllexport"             { count(); tokens_seen++; }
 "dllimport"             { count(); tokens_seen++; }
