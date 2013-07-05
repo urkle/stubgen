@@ -15,3 +15,9 @@
 *.exe
 *.out
 *.app
+stubgen
+
+# lexer/yaccer files
+lex.yy.c
+y.tab.c
+y.tab.h
